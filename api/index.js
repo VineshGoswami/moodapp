@@ -44,9 +44,9 @@ app.delete('/api/admin/cleanup', async (req, res, next) => {
     }
 });
 
-// Health
+// Health - responds immediately without waiting for DB
 app.get('/api/health', (req, res) => {
-    res.json({ success: true, data: { status: 'ok', uptime: process.uptime(), version: '2.0.0' } });
+    res.json({ success: true, data: { status: 'ok', uptime: process.uptime(), version: '2.0.0', env: { mongo: !!process.env.MONGO_URI, jwt: !!process.env.JWT_SECRET } } });
 });
 
 app.use((req, res) => res.status(404).json({ success: false, message: 'Route not found' }));
