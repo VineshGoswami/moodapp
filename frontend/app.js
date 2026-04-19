@@ -5,9 +5,9 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
     document.body.appendChild(errDiv);
 };
 
-const REAL_API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:5000' 
-    : 'https://moodpulse-backend.up.railway.app'; 
+// On localhost → hit the local backend. On Vercel → same domain, use relative /api
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const REAL_API_URL = isLocal ? 'http://localhost:5000' : '';
 const API_BASE = `${REAL_API_URL}/api`;
 
 let token = localStorage.getItem('moodpulse_token');
@@ -18,12 +18,17 @@ let userRole = localStorage.getItem('moodpulse_role');
 const authOverlay = document.getElementById('authOverlay');
 const appContainer = document.getElementById('app');
 
-// Socket.io — optional, gracefully degrades on Vercel serverless
+// Socket.io — only connects locally, skipped on Vercel serverless
 let socket;
 try {
-    socket = io(REAL_API_URL, { timeout: 5000, reconnectionAttempts: 2 });
+    const socketUrl = isLocal ? 'http://localhost:5000' : null;
+    if (socketUrl) {
+        socket = io(socketUrl, { timeout: 5000, reconnectionAttempts: 2 });
+    } else {
+        throw new Error('serverless');
+    }
 } catch(e) {
-    socket = { on: () => {}, emit: () => {} }; // no-op stub
+    socket = { on: () => {}, emit: () => {} }; // no-op stub for Vercel
 }
 
 // --- Auth UI Flow ---
