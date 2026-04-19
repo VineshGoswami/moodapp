@@ -17,7 +17,14 @@ let userRole = localStorage.getItem('moodpulse_role');
 
 const authOverlay = document.getElementById('authOverlay');
 const appContainer = document.getElementById('app');
-const socket = io(REAL_API_URL);
+
+// Socket.io — optional, gracefully degrades on Vercel serverless
+let socket;
+try {
+    socket = io(REAL_API_URL, { timeout: 5000, reconnectionAttempts: 2 });
+} catch(e) {
+    socket = { on: () => {}, emit: () => {} }; // no-op stub
+}
 
 // --- Auth UI Flow ---
 if (!token) {
