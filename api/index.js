@@ -4,10 +4,10 @@ const mongoose = require('mongoose');
 // Import the plain Express app (no socket.io for serverless)
 const express = require('express');
 const cors = require('cors');
-const moodsRouter = require('../src/routes/moods');
-const battleRouter = require('../src/routes/battle');
-const authRouter = require('../src/routes/auth');
-const errorHandler = require('../src/middleware/errorHandler');
+const moodsRouter = require('./backend/src/routes/moods');
+const battleRouter = require('./backend/src/routes/battle');
+const authRouter = require('./backend/src/routes/auth');
+const errorHandler = require('./backend/src/middleware/errorHandler');
 const jwt = require('jsonwebtoken');
 
 const app = express();
@@ -34,7 +34,7 @@ app.delete('/api/admin/cleanup', async (req, res, next) => {
         if (decoded.role !== 'admin')
             return res.status(403).json({ success: false, message: 'Forbidden: Admins only' });
         const thirtyDaysAgo = new Date(new Date().setDate(new Date().getDate() - 30));
-        const Mood = require('../src/models/Mood');
+        const Mood = require('./backend/src/models/Mood');
         const result = await Mood.deleteMany({ createdAt: { $lt: thirtyDaysAgo } });
         res.json({ success: true, deleted: result.deletedCount, message: 'Cleanup complete' });
     } catch (error) {

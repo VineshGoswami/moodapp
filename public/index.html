@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodPulse V2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Syne:wght@400..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Auth Gateway Modal (Signup/Login) -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-card glass-card">
+            <h1>MoodPulse</h1>
+            <p class="subtitle" style="margin-bottom: 2rem;">Login to pulse your vibe</p>
+            
+            <div id="loginView">
+                <form id="loginForm">
+                    <input type="text" id="loginUser" placeholder="Username" required class="admin-input" style="width: 100%; margin-bottom: 1rem;">
+                    <input type="password" id="loginPass" placeholder="Password" required class="admin-input" style="width: 100%; margin-bottom: 1rem;">
+                    <button type="submit" class="submit-btn" style="width: 100%;">Login</button>
+                </form>
+                <p style="margin-top: 1rem; text-align: center; font-size: 0.9rem;">
+                    New? <a href="#" id="showRegisterLink" style="color: var(--accent-cyan);">Create an account</a>
+                </p>
+            </div>
+
+            <div id="registerView" class="hidden">
+                <form id="registerForm">
+                    <input type="text" id="regUser" placeholder="Username" required class="admin-input" style="width: 100%; margin-bottom: 1rem;">
+                    <input type="password" id="regPass" placeholder="Password" required class="admin-input" style="width: 100%; margin-bottom: 1rem;">
+                    <button type="submit" class="submit-btn" style="width: 100%; background: var(--accent-amber); color: #000;">Sign Up</button>
+                </form>
+                <p style="margin-top: 1rem; text-align: center; font-size: 0.9rem;">
+                    Already joined? <a href="#" id="showLoginLink" style="color: var(--accent-amber);">Back to login</a>
+                </p>
+            </div>
+            <div id="authMessage" class="message hidden"></div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="hidden">
+        <header>
+            <div class="logo">
+                <h1>MoodPulse</h1>
+                <div class="status-indicator">
+                    <span class="dot" id="api-status-dot"></span>
+                    <span id="api-status-text">Checking</span>
+                </div>
+            </div>
+            <p class="subtitle">A real-time public mood board <span id="welcomeUser" style="color:var(--accent-cyan)"></span></p>
+            
+            <div class="header-tools">
+                <div class="streak-container tooltip" id="streakContainer">
+                    🔥 <span id="streakCount">0</span>
+                    <span class="tooltiptext">Start your streak today!</span>
+                </div>
+                <div class="live-watchers">
+                    👁 <span id="watchersCount">1</span> people watching live
+                </div>
+                <div class="export-tools">
+                    <button id="exportBtn" class="tool-btn">📸 Export</button>
+                    <button id="shareBtn" class="tool-btn">🌊 Share</button>
+                    <button id="logoutBtn" class="tool-btn" style="color: #ff5555; border-color: #ff5555;">🚪 Logout</button>
+                    <button id="navAdminBtn" class="tool-btn hidden" style="color: var(--accent-amber); border-color: var(--accent-amber);">👑 Admin</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section class="board-section">
+                <div class="canvas-container">
+                    <canvas id="moodCanvas"></canvas>
+                </div>
+            </section>
+
+            <section class="panels-section">
+                <div class="glass-card submit-card">
+                    <h2>Share Your Mood</h2>
+                    <form id="moodForm">
+                        <div class="form-group">
+                            <label>Emoji & Label</label>
+                            <div class="emoji-selector">
+                                <button type="button" class="emoji-btn" data-emoji="😀" data-label="Happy">😀</button>
+                                <button type="button" class="emoji-btn" data-emoji="😢" data-label="Sad">😢</button>
+                                <button type="button" class="emoji-btn" data-emoji="😡" data-label="Angry">😡</button>
+                                <button type="button" class="emoji-btn" data-emoji="😴" data-label="Tired">😴</button>
+                                <button type="button" class="emoji-btn" data-emoji="🥳" data-label="Excited">🥳</button>
+                                <button type="button" class="emoji-btn" data-emoji="😎" data-label="Cool">😎</button>
+                            </div>
+                            <input type="hidden" id="selectedEmoji">
+                            <input type="hidden" id="selectedLabel">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="intensity">Intensity (1-10): <span id="intensityVal">5</span></label>
+                            <input type="range" id="intensity" min="1" max="10" value="5" class="slider" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="note">Note (Optional, max 200 chars)</label>
+                            <textarea id="note" maxlength="200" rows="3" placeholder="Why are you feeling this way?"></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">Pulse Mood</button>
+                        <div id="formMessage" class="message hidden"></div>
+                    </form>
+                </div>
+
+                <div class="glass-card stats-card">
+                    <h2>Mood Stats</h2>
+                    <div class="filter-controls">
+                        <button class="filter-btn active" data-filter="today">Today</button>
+                        <button class="filter-btn" data-filter="week">This Week</button>
+                        <button class="filter-btn" data-filter="all">All Time</button>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Total Entries</div>
+                            <div class="stat-value" id="statTotal">--</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Avg Intensity</div>
+                            <div class="stat-value" id="statAvg">--</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Top Mood</div>
+                            <div class="stat-value" id="statTop">--</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Today's Pulses</div>
+                            <div class="stat-value" id="statToday">--</div>
+                        </div>
+                    </div>
+
+                    <!-- Heatmap component -->
+                    <div class="heatmap-section">
+                        <h3>This Week's Pulse</h3>
+                        <div id="heatmapGrid" class="heatmap-grid">
+                            <!-- JS populated -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <div id="offlineMessage" class="hidden glass-card offline-card">
+                <p>⚠️ The MoodPulse server is currently unreachable. Graceful offline mode active. Trying to reconnect...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mood Battle Floating Panel -->
+    <div class="battle-panel hidden" id="battlePanel">
+        <div class="battle-header">
+            Mood Battle ⚡
+            <button class="close-btn" id="hideBattleBtn">×</button>
+        </div>
+        <div class="battle-content" id="battleContent">
+            <div class="loading-battle">Loading battle...</div>
+            <!-- JS populated -->
+        </div>
+        <div class="leaderboard-section">
+            <h4>Leaderboard</h4>
+            <div id="battleLeaderboard"></div>
+        </div>
+    </div>
+
+    <!-- Admin Drawer -->
+    <div class="admin-drawer" id="adminDrawer">
+        <h2>Admin Portal</h2>
+        <div class="admin-stats">
+            <div class="stat-label">Moods Needs Cleanup:</div>
+            <div class="admin-value" id="adminCleanupCount">--</div>
+        </div>
+        <p class="admin-desc">Clicking below removes moods older than 30 days.</p>
+        <button id="adminCleanupBtn" class="submit-btn" style="background:var(--accent-amber);color:#000;">Clear old moods</button>
+        <div id="adminMessage" class="message hidden"></div>
+        <button class="close-drawer" id="closeAdminBtn">Close</button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
