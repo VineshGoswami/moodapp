@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodPulse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Syne:wght@400..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="logo">
+                <h1>MoodPulse</h1>
+                <div class="status-indicator">
+                    <span class="dot" id="api-status-dot"></span>
+                    <span id="api-status-text">Checking</span>
+                </div>
+            </div>
+            <p class="subtitle">A real-time public mood board</p>
+        </header>
+
+        <main>
+            <section class="board-section">
+                <div class="canvas-container">
+                    <canvas id="moodCanvas"></canvas>
+                </div>
+            </section>
+
+            <section class="panels-section">
+                <div class="glass-card submit-card">
+                    <h2>Share Your Mood</h2>
+                    <form id="moodForm">
+                        <div class="form-group">
+                            <label>Emoji & Label</label>
+                            <div class="emoji-selector">
+                                <button type="button" class="emoji-btn" data-emoji="😀" data-label="Happy">😀</button>
+                                <button type="button" class="emoji-btn" data-emoji="😢" data-label="Sad">😢</button>
+                                <button type="button" class="emoji-btn" data-emoji="😡" data-label="Angry">😡</button>
+                                <button type="button" class="emoji-btn" data-emoji="😴" data-label="Tired">😴</button>
+                                <button type="button" class="emoji-btn" data-emoji="🥳" data-label="Excited">🥳</button>
+                                <button type="button" class="emoji-btn" data-emoji="😎" data-label="Cool">😎</button>
+                            </div>
+                            <input type="hidden" id="selectedEmoji" required>
+                            <input type="hidden" id="selectedLabel" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="intensity">Intensity (1-10): <span id="intensityVal">5</span></label>
+                            <input type="range" id="intensity" min="1" max="10" value="5" class="slider" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="note">Note (Optional, max 200 chars)</label>
+                            <textarea id="note" maxlength="200" rows="3" placeholder="Why are you feeling this way?"></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">Pulse Mood</button>
+                        <div id="formMessage" class="message hidden"></div>
+                    </form>
+                </div>
+
+                <div class="glass-card stats-card">
+                    <h2>Mood Stats</h2>
+                    <div class="filter-controls">
+                        <button class="filter-btn active" data-filter="today">Today</button>
+                        <button class="filter-btn" data-filter="week">This Week</button>
+                        <button class="filter-btn" data-filter="all">All Time</button>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Total Entries</div>
+                            <div class="stat-value" id="statTotal">--</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Avg Intensity</div>
+                            <div class="stat-value" id="statAvg">--</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Top Mood</div>
+                            <div class="stat-value" id="statTop">--</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Today's Pulses</div>
+                            <div class="stat-value" id="statToday">--</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <div id="offlineMessage" class="hidden glass-card offline-card">
+                <p>⚠️ The MoodPulse server is currently unreachable. Graceful offline mode active. Trying to reconnect...</p>
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
