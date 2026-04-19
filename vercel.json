@@ -1,7 +1,13 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/index.js", "use": "@vercel/node" },
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["backend/src/**", "backend/package.json"]
+      }
+    },
     { "src": "public/index.html", "use": "@vercel/static" },
     { "src": "public/app.js", "use": "@vercel/static" },
     { "src": "public/style.css", "use": "@vercel/static" }
