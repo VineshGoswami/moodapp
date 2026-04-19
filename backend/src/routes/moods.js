@@ -10,7 +10,9 @@ const createMoodLimiter = rateLimit({
     message: { success: false, message: 'Too many mood entries created from this IP, please try again after 15 minutes' }
 });
 
+router.get('/heatmap', moodController.getHeatmap);
 router.get('/stats', moodController.getStats);
+router.get('/streak/:userId', moodController.getStreak);
 router.get('/', moodController.getMoods);
 router.post('/', createMoodLimiter, moodController.createMood);
 

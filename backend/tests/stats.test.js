@@ -24,9 +24,9 @@ afterEach(async () => {
 
 describe('Mood API - Stats Tests', () => {
     it('should get correct total and top mood stats', async () => {
-        await Mood.create({ emoji: '😀', label: 'Happy', intensity: 8 });
-        await Mood.create({ emoji: '😀', label: 'Happy', intensity: 6 });
-        await Mood.create({ emoji: '😢', label: 'Sad', intensity: 4 });
+        await Mood.create({ emoji: '😀', label: 'Happy', intensity: 8, userId: 'test1' });
+        await Mood.create({ emoji: '😀', label: 'Happy', intensity: 6, userId: 'test1' });
+        await Mood.create({ emoji: '😢', label: 'Sad', intensity: 4, userId: 'test1' });
 
         const res = await request(app).get('/api/moods/stats');
         expect(res.statusCode).toEqual(200);

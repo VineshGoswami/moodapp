@@ -6,6 +6,10 @@ const moodSchema = new mongoose.Schema({
         type: String,
         default: uuidv4
     },
+    userId: {
+        type: String,
+        required: [true, 'UserId (UUID) is required']
+    },
     emoji: {
         type: String,
         required: [true, 'Emoji is required']

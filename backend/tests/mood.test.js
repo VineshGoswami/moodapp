@@ -28,7 +28,8 @@ describe('Mood API - CRUD Tests', () => {
             emoji: '😀',
             label: 'Happy',
             intensity: 8,
-            note: 'Feeling great!'
+            note: 'Feeling great!',
+            userId: 'test1'
         });
         expect(res.statusCode).toEqual(201);
         expect(res.body.success).toBe(true);
@@ -37,8 +38,8 @@ describe('Mood API - CRUD Tests', () => {
     });
 
     it('should fetch moods list', async () => {
-        await Mood.create({ emoji: '😀', label: 'Happy', intensity: 8 });
-        await Mood.create({ emoji: '😢', label: 'Sad', intensity: 3 });
+        await Mood.create({ emoji: '😀', label: 'Happy', intensity: 8, userId: 'test1' });
+        await Mood.create({ emoji: '😢', label: 'Sad', intensity: 3, userId: 'test1' });
 
         const res = await request(app).get('/api/moods');
         expect(res.statusCode).toEqual(200);
@@ -47,8 +48,8 @@ describe('Mood API - CRUD Tests', () => {
     });
 
     it('should filter moods by label', async () => {
-        await Mood.create({ emoji: '😀', label: 'Happy', intensity: 8 });
-        await Mood.create({ emoji: '😢', label: 'Sad', intensity: 3 });
+        await Mood.create({ emoji: '😀', label: 'Happy', intensity: 8, userId: 'test1' });
+        await Mood.create({ emoji: '😢', label: 'Sad', intensity: 3, userId: 'test1' });
 
         const res = await request(app).get('/api/moods?mood=sad');
         expect(res.statusCode).toEqual(200);
