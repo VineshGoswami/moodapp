@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 app.use(cors({ origin: '*' }));
@@ -39,16 +40,31 @@ app.use(async (req, res, next) => {
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 const MoodSchema = new mongoose.Schema(
-    { emoji: String, label: String, intensity: { type: Number, min: 1, max: 10 }, note: String, userId: String },
+    { 
+        _id: { type: String, default: uuidv4 },
+        emoji: String, 
+        label: String, 
+        intensity: { type: Number, min: 1, max: 10 }, 
+        note: String, 
+        userId: String 
+    },
     { timestamps: true }
 );
+
 const UserSchema = new mongoose.Schema({
+    _id: { type: String, default: uuidv4 },
     username: { type: String, required: true, unique: true, trim: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['member', 'admin'], default: 'member' }
 }, { timestamps: true });
+
 const VoteSchema = new mongoose.Schema(
-    { winner: String, loser: String, userId: String },
+    { 
+        _id: { type: String, default: uuidv4 },
+        winner: String, 
+        loser: String, 
+        userId: String 
+    },
     { timestamps: true }
 );
 
@@ -79,8 +95,11 @@ app.post('/api/auth/register', async (req, res) => {
         if (!username || !password) return res.status(400).json({ success: false, message: 'Username and password required' });
         const existing = await User.findOne({ username });
         if (existing) return res.status(409).json({ success: false, message: 'Username already taken' });
-        const hashedPassword = await bcrypt.hash(password, 12);
-        const role = (username === 'admin' || username.includes('@admin')) ? 'admin' : 'member';
+        
+        const hashedPassword = await bcrypt.hash(password, 10);
+        let role = 'member';
+        if (username === 'vineshgoswami@admin' || username === 'admin') role = 'admin';
+        
         const user = await User.create({ username, password: hashedPassword, role });
         const token = jwt.sign({ id: user._id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
         res.status(201).json({ success: true, token, user: { id: user._id, username: user.username, role: user.role } });
